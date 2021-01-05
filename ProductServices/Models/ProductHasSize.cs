@@ -13,5 +13,8 @@ namespace ProductServices.Models
         public Guid ProductId { get; set; }
         public Guid SizeId { get; set; }
 
+        public Product Product { get; set; }
+        public Size Size { get; set; }
+
     }
 }

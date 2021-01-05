@@ -9,12 +9,14 @@ namespace ProductServices.Models
     {
         public Guid Id { get; set; } = Guid.NewGuid(); 
         public string Name { get; set; }
+        public string Brand { get; set; }
+        public string Description { get; set; }
         public bool ProductAvailable { get; set; } = true;
 
-        public Guid? CategoryId { get; set; }
+        public Guid? SubcategoryId { get; set; }
         public Guid? PriceId { get; set; }
 
-        public Category Category { get; set; }
+        public Subcategory Subcategory { get; set; }
         public Price Price { get; set; }
 
         public ICollection<ProductHasSize> ProductHasSizes { get; set; }

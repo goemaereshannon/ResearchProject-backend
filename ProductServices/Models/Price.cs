@@ -8,7 +8,7 @@ namespace ProductServices.Models
     public class Price
     {
         public Guid Id { get; set; } = Guid.NewGuid(); 
-        public float Value { get; set; }
+        public double Value { get; set; }
         public string Currency { get; set; }
         public float? Discount { get; set; }
 
