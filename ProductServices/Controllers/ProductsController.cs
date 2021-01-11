@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProductServices.Data;
+using ProductServices.DTOs;
 using ProductServices.Models;
+using ProductServices.Repositories;
 
 namespace ProductServices.Controllers
 {
@@ -15,17 +18,36 @@ namespace ProductServices.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly ProductServicesContext _context;
+        private readonly IGenericRepo<Product> genericProductRepo;
+        private readonly IProductRepo productRepo;
+        private readonly IMapper mapper;
 
-        public ProductsController(ProductServicesContext context)
+        public ProductsController(ProductServicesContext context, IProductRepo productRepo, IMapper mapper)
         {
             _context = context;
+            this.productRepo = productRepo;
+            this.mapper = mapper;
         }
 
         // GET: api/Products
+        /// <summary>
+        /// Get all products orderded by newest first. 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            IEnumerable<Product> products;
+            try
+            {
+                products = await productRepo.GetAllAsync(); 
+            }
+            catch(Exception exc)
+            {
+                return NotFound(new { message = "Products not found " + exc }); 
+            }
+            var productDTO = mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products); 
+            return Ok(productDTO); 
         }
 
         // GET: api/Products/5

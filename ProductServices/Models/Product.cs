@@ -13,6 +13,7 @@ namespace ProductServices.Models
         public string Description { get; set; }
         public bool ProductAvailable { get; set; } = true;
         public string ImageUrl { get; set; }
+        public DateTime CreationDate { get; set; } = DateTime.Now; 
 
         public Guid? SubcategoryId { get; set; }
         public Guid? PriceId { get; set; }

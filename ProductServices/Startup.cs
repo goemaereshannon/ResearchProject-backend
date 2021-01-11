@@ -13,6 +13,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using ProductServices.Data;
+using ProductServices.Repositories;
+using AutoMapper;
+using ProductServices.Profiles;
 
 namespace ProductServices
 {
@@ -40,12 +43,20 @@ namespace ProductServices
                 options.UseSqlServer(Configuration.GetConnectionString("ProductServicesDB"));
             } );
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
+                ;
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProductServices", Version = "v1" });
-            }); 
+            });
+            //mapper
+            services.AddAutoMapper(typeof(ProductProfile));
+
+            //repos 
+            services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
+            services.AddScoped<IProductRepo, ProductRepo>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
