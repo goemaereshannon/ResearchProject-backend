@@ -12,6 +12,7 @@ namespace ProductServices.Models
         public string Brand { get; set; }
         public string Description { get; set; }
         public bool ProductAvailable { get; set; } = true;
+        public string ImageUrl { get; set; }
 
         public Guid? SubcategoryId { get; set; }
         public Guid? PriceId { get; set; }
@@ -20,6 +21,7 @@ namespace ProductServices.Models
         public Price Price { get; set; }
 
         public ICollection<ProductHasSize> ProductHasSizes { get; set; }
+        public ICollection<ProductHasProperty> ProductHasProperties { get; set; }
 
     }
 }

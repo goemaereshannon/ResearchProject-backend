@@ -98,5 +98,35 @@ namespace ProductServices.Data
                 Stock = 10
             }
         };
+
+        private readonly static List<Property> _propertiesData = new List<Property>()
+        {
+            new Property
+            {
+                Id =  new Guid("fa38c158-cde3-4e01-a3a8-92ff534d2a89"),
+                Name = "Scent",
+            }
+        };
+
+        private readonly static List<PropertyValue> _propertyValuesData = new List<PropertyValue>()
+        {
+            new PropertyValue
+            {
+                Id = new Guid("a3a45628-329e-49c6-b495-f8a11acf47ec"), 
+                PropertyId =  new Guid("fa38c158-cde3-4e01-a3a8-92ff534d2a89"),
+                Value = "Almond"
+                
+            }
+        };
+
+        private readonly static List<ProductHasProperty> _productHasPropertyData = new List<ProductHasProperty>()
+        {
+            new ProductHasProperty
+            {
+                Id = new Guid("ff64f462-4303-4204-8f0a-f1500c1f47b6"),
+                PropertyId =  new Guid("fa38c158-cde3-4e01-a3a8-92ff534d2a89"), 
+                ProductId=  new Guid("d470123f-7795-4158-aa2b-9088e29de88d"),
+            }
+        };
     }
 }
