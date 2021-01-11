@@ -21,7 +21,10 @@ namespace ProductServices.Data
                 modelBuilder.Entity<Price>().HasData(_pricesData);
                 modelBuilder.Entity<Size>().HasData(_sizesData);
                 modelBuilder.Entity<ProductHasSize>().HasData(_productHasSizesData);
-                modelBuilder.Entity<Product>().HasData(_productsData); 
+                modelBuilder.Entity<Product>().HasData(_productsData);
+                modelBuilder.Entity<ProductHasProperty>().HasData(_productHasPropertyData);
+                modelBuilder.Entity<Property>().HasData(_propertiesData);
+                modelBuilder.Entity<PropertyValue>().HasData(_propertyValuesData); 
             }
             catch(Exception e)
             {

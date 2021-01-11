@@ -16,10 +16,10 @@ namespace ProductServices.DTOs
         public string ImageUrl { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
 
-        public Subcategory Subcategory { get; set; }
-        public Price Price { get; set; }
+        public SubcategoryDTO Subcategory { get; set; }
+        public PriceDTO Price { get; set; }
 
-        public ICollection<ProductHasSize> Sizes { get; set; }
-        public ICollection<ProductHasProperty> Properties { get; set; }
+        public ICollection<ProductHasSizeDTO> Sizes { get; set; }
+        public ICollection<ProductHasPropertyDTO> Properties { get; set; }
     }
 }

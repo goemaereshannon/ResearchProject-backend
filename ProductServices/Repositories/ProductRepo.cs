@@ -20,7 +20,7 @@ namespace ProductServices.Repositories
             return await _context.Products
                 .Include(p => p.Price)
                 .Include(p => p.Subcategory).ThenInclude(s => s.Category)
-                .Include(p=> p.ProductHasProperties).ThenInclude(p=>p.Property).ThenInclude(p=> p.ProductHasProperties)
+                .Include(p=> p.ProductHasProperties).ThenInclude(p=>p.Property).ThenInclude(p=> p.PropertyValues)
                 .Include(p=>p.ProductHasSizes).ThenInclude(p=> p.Size)
                 .OrderBy(p => p.CreationDate)
                 .ToListAsync(); 

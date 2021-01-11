@@ -17,6 +17,16 @@ namespace ProductServices.Profiles
         private void InitProductMapper()
         {
             CreateMap<ProductDTO, Product>().ReverseMap();
+            CreateMap<CategoryDTO, Category>().ReverseMap();
+            CreateMap<PriceDTO, Price>().ReverseMap();
+            CreateMap<ProductHasPropertyDTO, ProductHasProperty>().ReverseMap();
+            CreateMap<ProductHasSizeDTO, ProductHasSize>().ReverseMap();
+            CreateMap<PropertyDTO, Property>().ReverseMap();
+            CreateMap<PropertyValueDTO, PropertyValue>().ReverseMap();
+            CreateMap<SizeDTO, Size>().ReverseMap();
+            CreateMap<SubcategoryDTO, Subcategory>().ReverseMap();
+
+
         }
     }
 }
