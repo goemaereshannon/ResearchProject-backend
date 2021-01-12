@@ -288,7 +288,27 @@ namespace ProductServices.Controllers
             }
         }
 
-        [HttpPost("api/products")]
+        [HttpGet("/api/category/subcategories")]
+        public async Task<ActionResult<IEnumerable<SubcategoryDTO>>> GetSubcategoriesByCategoryId([FromQuery] string categoryId) {
+            try
+            {
+                IEnumerable<Subcategory> subcategories;
+                subcategories = await genericSubcategoryRepo.GetByExpressionAsync(sc => sc.CategoryId == new Guid(categoryId));
+                return Ok(mapper.Map<IEnumerable<SubcategoryDTO>>(subcategories)); 
+            }
+            catch (Exception exc)
+            {
+
+                return RedirectToAction("HandleErrorCode", "Error", new
+                {
+                    statusCode = 400,
+                    errorMessage = $"Getting subcategories for category with id {categoryId} failed {exc}"
+                });
+                throw;
+            }
+                }
+
+        [HttpPost("/api/products")]
         public async Task<ActionResult<ProductCreateEditDTO>> PostProduct([FromBody] ProductCreateEditDTO productDTO)
         {
             try
@@ -345,7 +365,12 @@ namespace ProductServices.Controllers
             }
             catch (Exception exc)
             {
-
+                return RedirectToAction("HandleErrorCode", "Error", new
+                {
+                    statusCode = 400,
+                    errorMessage = $"Creating product {productDTO.Name} failed {exc}"
+                });
+                throw;
                 throw exc;
             }
         }
