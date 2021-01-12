@@ -68,7 +68,7 @@ public class GenericRepo<TEntity> : IGenericRepo<TEntity> where TEntity : class
         }
         catch (Exception ex)
         {
-            throw new Exception($"{nameof(entity)} could not be saved");
+            throw new Exception($"{nameof(entity)} could not be saved {ex}");
         }
     }
 

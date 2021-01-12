@@ -50,7 +50,7 @@ namespace ProductServices.Controllers
             return Ok(productDTO); 
         }
 
-        // GET: api/Products/5
+        // GET: api/products/guid
         [HttpGet("/api/products/{id}")]
         public async Task<ActionResult<Product>> GetProductById(Guid id)
         {
@@ -76,37 +76,132 @@ namespace ProductServices.Controllers
             }
         }
 
-        // PUT: api/Products/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(Guid id, Product product)
+        // GET: api/products/guid
+        [HttpGet("/api/productsearch")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductBySearch([FromQuery] string search)
         {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(product).State = EntityState.Modified;
-
+            search = Uri.UnescapeDataString(search); 
+            IEnumerable<Product> products;
+            IEnumerable<ProductDTO> results; 
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
+                if (string.IsNullOrEmpty(search))
                 {
-                    return NotFound();
+                    try
+                    {
+                        products = await productRepo.GetAllAsync();
+                    }
+                    catch (Exception exc)
+                    {
+                        return NotFound(new { message = "Products not found " + exc });
+                    }
+                    
                 }
                 else
                 {
-                    throw;
-                }
-            }
+                    try
+                    {
+                        products = await productRepo.GetByExpressionAsync(pr =>
+                            pr.Subcategory.Name.Contains(search) ||
+                            pr.Name.Contains(search) ||
+                            pr.Brand.Contains(search) || 
+                            pr.Subcategory.Category.Name.Contains(search)
+                            ) ;
+                    }
+                    catch (Exception exc)
+                    {
 
-            return NoContent();
+                        return NotFound(new { message = "No product found with searchterm " + search +" Reason: " + exc  });
+                    }
+                }
+                results = mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
+                return Ok(results); 
+                
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = $"Product not found {ex}" });
+                throw;
+            }
         }
+
+        [HttpGet("/api/products/category")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategory([FromQuery] string category, string subcategory)
+        {
+
+            try
+            {
+                IEnumerable<Product> products;
+                IEnumerable<ProductDTO> results; 
+
+                //geen (sub)category meegegeven of category is Nieuw 
+                if (!string.IsNullOrEmpty(category) || !string.IsNullOrEmpty(subcategory) || category != "Nieuw")
+                {
+                    category = Uri.UnescapeDataString(category);
+                    subcategory = Uri.UnescapeDataString(subcategory);
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(subcategory))
+                        {
+                            try
+                            {
+                                products = await productRepo.GetByExpressionAsync(pr => pr.Subcategory.Name == subcategory);
+                            }
+                            catch (Exception)
+                            {
+
+                                throw;
+                            }
+
+                        }
+                        //category meegegeven 
+                        else if (!string.IsNullOrEmpty(category))
+                        {
+                            try
+                            {
+                                products = await productRepo.GetByExpressionAsync(pr =>
+                                           pr.Subcategory.Category.Name == category
+                           );
+
+                            }
+                            catch (Exception)
+                            {
+
+                                throw;
+                            }
+                            results = mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
+                            return Ok(results);
+                        }
+
+                    }
+                    catch (Exception exc)
+                    {
+
+                        return NotFound(new { message = "No product found with category or subcategory " + category + subcategory + " Reason: " + exc });
+                    }
+                }
+                //category en/of subcategory meegegeven 
+                try
+                {
+                    products = await productRepo.GetAllAsync();
+                }
+                catch (Exception exc)
+                {
+                    return NotFound(new { message = "Products not found " + exc });
+                }
+
+                results = mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(products);
+                return Ok(results);
+
+
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = $"Product not found {ex}" });
+                throw;
+            }
+        }
+
 
         // POST: api/Products
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -118,22 +213,6 @@ namespace ProductServices.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetProduct", new { id = product.Id }, product);
-        }
-
-        // DELETE: api/Products/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Product>> DeleteProduct(Guid id)
-        {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
-
-            return product;
         }
 
         private bool ProductExists(Guid id)

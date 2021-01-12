@@ -4,6 +4,7 @@ using ProductServices.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ProductServices.Repositories
@@ -32,6 +33,14 @@ namespace ProductServices.Repositories
                 .Include(p => p.Subcategory).ThenInclude(s => s.Category)
                 .Include(p => p.ProductHasProperties).ThenInclude(p => p.Property).ThenInclude(p => p.PropertyValues)
                 .Include(p => p.ProductHasSizes).ThenInclude(p => p.Size).FirstOrDefaultAsync(pr => pr.Id == Id); 
+        }
+
+        public override async Task<IEnumerable<Product>> GetByExpressionAsync(Expression<Func<Product, bool>> expression)
+        {
+            return await _context.Set<Product>().Where(expression).AsNoTracking().Include(p => p.Price)
+                .Include(p => p.Subcategory).ThenInclude(s => s.Category)
+                .Include(p => p.ProductHasProperties).ThenInclude(p => p.Property).ThenInclude(p => p.PropertyValues)
+                .Include(p => p.ProductHasSizes).ThenInclude(p => p.Size).ToListAsync();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using ProductServices.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ProductServices.Repositories
@@ -9,5 +10,6 @@ namespace ProductServices.Repositories
     {
         Task<IEnumerable<Product>> GetAllAsync();
         Task<Product> GetAsyncByGuid(Guid Id);
+        Task<IEnumerable<Product>> GetByExpressionAsync(Expression<Func<Product, bool>> expression);
     }
 }
