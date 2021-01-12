@@ -20,12 +20,16 @@ namespace ProductServices.Controllers
         private readonly ProductServicesContext _context;
         private readonly IGenericRepo<Product> genericProductRepo;
         private readonly IProductRepo productRepo;
+        private readonly IGenericRepo<Category> genericCategoryRepo;
+        private readonly IGenericRepo<Subcategory> genericSubcategoryRepo;
         private readonly IMapper mapper;
 
-        public ProductsController(ProductServicesContext context, IProductRepo productRepo, IMapper mapper)
+        public ProductsController(ProductServicesContext context, IProductRepo productRepo, IGenericRepo<Category> genericCategoryRepo, IGenericRepo<Subcategory> genericSubcategoryRepo  ,IMapper mapper)
         {
             _context = context;
             this.productRepo = productRepo;
+            this.genericCategoryRepo = genericCategoryRepo;
+            this.genericSubcategoryRepo = genericSubcategoryRepo;
             this.mapper = mapper;
         }
 
@@ -202,17 +206,83 @@ namespace ProductServices.Controllers
             }
         }
 
-
-        // POST: api/Products
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<ActionResult<SubcategoryDTO>> PostSubcategory([FromBody] SubcategoryDTO subcategoryDTO)
         {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
+            try
+            {
+                if(subcategoryDTO == null)
+                {
+                    return BadRequest(new { message = "No subcategory input" }); 
+                }
+                Subcategory newSubcategory = new Subcategory(); 
 
-            return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+                
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        public async Task<ActionResult<CategoryDTO>> PostCategory([FromBody] CategoryDTO categoryDTO) {
+            try
+            {
+                if(categoryDTO == null)
+                {
+                    return BadRequest(new { message = "No category input" }); 
+                }
+                Category newCategory = await genericCategoryRepo.Create(mapper.Map<Category>(categoryDTO));
+                return Ok(categoryDTO); 
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        // POST: api/products
+        [HttpPost("api/products")]
+        public async Task<ActionResult<ProductCreateEditDTO>> PostProduct([FromBody] ProductCreateEditDTO productDTO)
+        {
+            try
+            {
+                if(productDTO == null)
+                {
+                    return BadRequest(new { message = "No product input" }); 
+                }
+                Product newProduct = new Product();
+
+                //bestaat subcategory al? 
+                var subcategory = await genericSubcategoryRepo.GetByExpressionAsync(pr => pr.Name == productDTO.Subcategoryname);
+                Subcategory productSubcategory = subcategory.FirstOrDefault();
+                if (productSubcategory == null) //subcategory bestaat nog niet 
+                {
+                    SubcategoryDTO subDTO = new SubcategoryDTO();
+                    subDTO.Name = productDTO.Subcategoryname;
+                    subDTO.Description = productDTO.Subcategorydescription;
+                    
+                   
+                    //bestaat category al? 
+                    var category = await genericCategoryRepo.GetByExpressionAsync(ca => ca.Name == productDTO.Categoryname);
+                    Category productCategory = category.FirstOrDefault(); 
+                    if(productCategory == null)// category bestaat nog niet 
+                    {
+                        CategoryDTO catDTO = new CategoryDTO();
+                        catDTO.Name = productDTO.Categoryname;
+                        catDTO.Description = productDTO.Categorydescription;
+                        await PostCategory(catDTO); 
+
+                    }
+                    //post subcategory
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         private bool ProductExists(Guid id)

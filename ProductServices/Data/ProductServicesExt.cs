@@ -39,8 +39,8 @@ namespace ProductServices.Data
             new Category
             {
                 Id = new Guid("9E17AF7B-DF05-4C69-94B8-586659C7152F"),
-                Name = "Beauty",
-                Description = "Make-up, perfume, hair care and skin care",
+                Name = "Cosmetica",
+                Description = "Make-up, parfum, haar- en huidverzorging",
             }
         };
 
@@ -49,8 +49,8 @@ namespace ProductServices.Data
             new Subcategory
             {
                 Id= new Guid("79A86C66-F7E4-4BC4-9E01-525AD78754BD"),
-                Name = "Body Lotion", 
-                Description = "Body lotion or body milk is a thick fluid oil-in-water emulsion which is applied on the skin to hydrate", 
+                Name = "Body lotion", 
+                Description = "Body lotion of body milk is een dikke vloeibare olie-in-water emulsie om het lichaam te hydrateren", 
                 CategoryId = new Guid("9E17AF7B-DF05-4C69-94B8-586659C7152F"),
             }
         };
@@ -73,7 +73,7 @@ namespace ProductServices.Data
             {
                 Id=  new Guid("d470123f-7795-4158-aa2b-9088e29de88d"),
                 Name = "Repair Almond",
-                Description = "Body Lotion for dry, sun damaged skin. Almond scented",
+                Description = "Body Lotion voor droge, door zon beschadigde huid. Met amandelgeur.",
                 ProductAvailable = true,
                 Brand = "YSL",
                 SubcategoryId = new Guid("79A86C66-F7E4-4BC4-9E01-525AD78754BD"),

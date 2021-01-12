@@ -22,7 +22,7 @@ namespace ProductServices
                 try
                 {
                     var context = services.GetRequiredService<ProductServicesContext>();
-                    //context.Database.EnsureDeleted();
+                    context.Database.EnsureDeleted();
                     context.Database.EnsureCreated();
                 }
                 catch (Exception ex)
