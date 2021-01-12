@@ -15,8 +15,8 @@ namespace ProductServices.Models
         public string ImageUrl { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now; 
 
-        public Guid? SubcategoryId { get; set; }
-        public Guid? PriceId { get; set; }
+        public Guid SubcategoryId { get; set; }
+        public Guid PriceId { get; set; }
 
         public Subcategory Subcategory { get; set; }
         public Price Price { get; set; }

@@ -20,14 +20,16 @@ namespace ProductServices.Controllers
         private readonly ProductServicesContext _context;
         private readonly IGenericRepo<Product> genericProductRepo;
         private readonly IProductRepo productRepo;
+        private readonly IGenericRepo<Price> genericPriceRepo;
         private readonly IGenericRepo<Category> genericCategoryRepo;
         private readonly IGenericRepo<Subcategory> genericSubcategoryRepo;
         private readonly IMapper mapper;
 
-        public ProductsController(ProductServicesContext context, IProductRepo productRepo, IGenericRepo<Category> genericCategoryRepo, IGenericRepo<Subcategory> genericSubcategoryRepo  ,IMapper mapper)
+        public ProductsController(ProductServicesContext context, IProductRepo productRepo, IGenericRepo<Price> genericPriceRepo , IGenericRepo<Category> genericCategoryRepo, IGenericRepo<Subcategory> genericSubcategoryRepo  ,IMapper mapper)
         {
             _context = context;
             this.productRepo = productRepo;
+            this.genericPriceRepo = genericPriceRepo;
             this.genericCategoryRepo = genericCategoryRepo;
             this.genericSubcategoryRepo = genericSubcategoryRepo;
             this.mapper = mapper;
@@ -206,60 +208,105 @@ namespace ProductServices.Controllers
             }
         }
 
+        [HttpGet("/api/category")]
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetCategory()
+        {
+            IEnumerable<Category> categories;
+            try
+            {
+                categories = await genericCategoryRepo.GetAllAsync();
+            }
+            catch (Exception exc)
+            {
+                return NotFound(new { message = "Products not found " + exc });
+            }
+            var categoryDTO = mapper.Map<IEnumerable<Category>, IEnumerable<CategoryDTO>>(categories);
+            return Ok(categoryDTO);
+        }
+
+        [HttpGet("/api/subcategory")]
+        public async Task<ActionResult<IEnumerable<SubcategoryDTO>>> GetSubcategory()
+        {
+            IEnumerable<Subcategory> subCategories;
+            try
+            {
+                subCategories = await genericSubcategoryRepo.GetAllAsync();
+            }
+            catch (Exception exc)
+            {
+                return NotFound(new { message = "Products not found " + exc });
+            }
+            var subcategoryDTO = mapper.Map<IEnumerable<Subcategory>, IEnumerable<SubcategoryDTO>>(subCategories);
+            return Ok(subcategoryDTO);
+        }
+
+        [HttpPost("/api/subcategory")]
         public async Task<ActionResult<SubcategoryDTO>> PostSubcategory([FromBody] SubcategoryDTO subcategoryDTO)
         {
             try
             {
-                if(subcategoryDTO == null)
+                if(!ModelState.IsValid)
                 {
                     return BadRequest(new { message = "No subcategory input" }); 
                 }
-                Subcategory newSubcategory = new Subcategory(); 
+                Subcategory newSubcategory = new Subcategory();
+                newSubcategory = await genericSubcategoryRepo.Create(mapper.Map<Subcategory>(subcategoryDTO));
+                return Ok(subcategoryDTO);
 
-                
             }
-            catch (Exception)
+            catch (Exception exc)
             {
-
+                return RedirectToAction("HandleErrorCode", "Error", new
+                {
+                    statusCode = 400,
+                    errorMessage = $"Creating category {subcategoryDTO.Name} failed {exc}"
+                });
                 throw;
             }
         }
 
+        [HttpPost("/api/category")]
         public async Task<ActionResult<CategoryDTO>> PostCategory([FromBody] CategoryDTO categoryDTO) {
             try
             {
-                if(categoryDTO == null)
+                if(!ModelState.IsValid)
                 {
                     return BadRequest(new { message = "No category input" }); 
                 }
-                Category newCategory = await genericCategoryRepo.Create(mapper.Map<Category>(categoryDTO));
+                Category newCategory = new Category();
+                newCategory = await genericCategoryRepo.Create(mapper.Map<Category>(categoryDTO));
                 return Ok(categoryDTO); 
             }
             catch (Exception)
             {
-
+                return RedirectToAction("HandleErrorCode", "Error", new
+                {
+                    statusCode = 400,
+                    errorMessage = $"Creating category {categoryDTO.Name} failed"
+                });
                 throw;
             }
         }
 
-        // POST: api/products
         [HttpPost("api/products")]
         public async Task<ActionResult<ProductCreateEditDTO>> PostProduct([FromBody] ProductCreateEditDTO productDTO)
         {
             try
             {
-                if(productDTO == null)
+                if(!ModelState.IsValid)
                 {
                     return BadRequest(new { message = "No product input" }); 
                 }
                 Product newProduct = new Product();
 
                 //bestaat subcategory al? 
+                CategoryDTO catDTO = null;
+                SubcategoryDTO subDTO = null; 
                 var subcategory = await genericSubcategoryRepo.GetByExpressionAsync(pr => pr.Name == productDTO.Subcategoryname);
                 Subcategory productSubcategory = subcategory.FirstOrDefault();
                 if (productSubcategory == null) //subcategory bestaat nog niet 
                 {
-                    SubcategoryDTO subDTO = new SubcategoryDTO();
+                    subDTO = new SubcategoryDTO();
                     subDTO.Name = productDTO.Subcategoryname;
                     subDTO.Description = productDTO.Subcategorydescription;
                     
@@ -269,19 +316,37 @@ namespace ProductServices.Controllers
                     Category productCategory = category.FirstOrDefault(); 
                     if(productCategory == null)// category bestaat nog niet 
                     {
-                        CategoryDTO catDTO = new CategoryDTO();
+                        catDTO = new CategoryDTO();
                         catDTO.Name = productDTO.Categoryname;
                         catDTO.Description = productDTO.Categorydescription;
-                        await PostCategory(catDTO); 
-
+                        await PostCategory(catDTO);
+                        subDTO.CategoryId = catDTO.Id;
                     }
-                    //post subcategory
+                    else // category bestaat wel
+                    {
+                        subDTO.CategoryId = productCategory.Id;
+                    }
+                    await PostSubcategory(subDTO);
+                    newProduct.SubcategoryId = subDTO.Id; 
                 }
+                else //subcategory bestaat al
+                {
+                    newProduct.SubcategoryId = productSubcategory.Id; 
+                }
+
+                //Post PRICE
+                PriceDTO newPrice = new PriceDTO();
+                newPrice.Value = productDTO.Price.Value;
+                newPrice.Id = productDTO.Price.Id; 
+                await genericPriceRepo.Create(mapper.Map<Price>(newPrice));
+                newProduct.PriceId = newPrice.Id; 
+
+                return Created("api/products", productDTO); 
             }
-            catch (Exception)
+            catch (Exception exc)
             {
 
-                throw;
+                throw exc;
             }
         }
 
