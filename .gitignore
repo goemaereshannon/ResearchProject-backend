@@ -8,3 +8,13 @@ ProductServices/obj/
 CartServices/obj/
 
 OrderServices/obj/
+
+ProductServices/bin/
+
+CartServices/bin/
+
+IdentityServices/bin/
+
+IdentityServices/obj/
+
+OrderServices/bin/
