@@ -85,7 +85,7 @@ namespace ProductServices
             app.UseSwaggerUI(c =>
             {
                 c.RoutePrefix = "swagger";
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Flight_DBc v1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProductServicesDB v1");
             });
         }
     }

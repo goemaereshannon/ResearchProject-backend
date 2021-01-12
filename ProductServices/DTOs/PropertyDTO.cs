@@ -9,5 +9,6 @@ namespace ProductServices.DTOs
     {
         public string Name { get; set; }
         public ICollection<PropertyValueDTO> PropertyValues { get; set; }
+        public ICollection<ProductHasPropertyDTO> ProductHasProperties { get; set; }
     }
 }

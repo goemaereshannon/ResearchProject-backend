@@ -25,5 +25,13 @@ namespace ProductServices.Repositories
                 .OrderBy(p => p.CreationDate)
                 .ToListAsync(); 
         }
+
+        public override async Task<Product> GetAsyncByGuid(Guid Id)
+        {
+            return await _context.Set<Product>().Include(p => p.Price)
+                .Include(p => p.Subcategory).ThenInclude(s => s.Category)
+                .Include(p => p.ProductHasProperties).ThenInclude(p => p.Property).ThenInclude(p => p.PropertyValues)
+                .Include(p => p.ProductHasSizes).ThenInclude(p => p.Size).FirstOrDefaultAsync(pr => pr.Id == Id); 
+        }
     }
 }

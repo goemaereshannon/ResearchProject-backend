@@ -19,7 +19,7 @@ namespace ProductServices.DTOs
         public SubcategoryDTO Subcategory { get; set; }
         public PriceDTO Price { get; set; }
 
-        public ICollection<ProductHasSizeDTO> Sizes { get; set; }
-        public ICollection<ProductHasPropertyDTO> Properties { get; set; }
+        public ICollection<ProductHasSizeDTO> ProductHasSizes { get; set; }
+        public ICollection<ProductHasPropertyDTO> ProductHasProperties { get; set; }
     }
 }

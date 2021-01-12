@@ -29,12 +29,12 @@ namespace ProductServices.Controllers
             this.mapper = mapper;
         }
 
-        // GET: api/Products
+        // GET: api/products
         /// <summary>
         /// Get all products orderded by newest first. 
         /// </summary>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("/api/products")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
         {
             IEnumerable<Product> products;
@@ -51,17 +51,29 @@ namespace ProductServices.Controllers
         }
 
         // GET: api/Products/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(Guid id)
+        [HttpGet("/api/products/{id}")]
+        public async Task<ActionResult<Product>> GetProductById(Guid id)
         {
-            var product = await _context.Products.FindAsync(id);
-
-            if (product == null)
+            try
             {
-                return NotFound();
-            }
+                if(id == Guid.Empty)
+                {
+                    return BadRequest(new { message = "Id is empty" }); 
+                }
 
-            return product;
+                Product product = await productRepo.GetAsyncByGuid(id); 
+                if(product == null || product.PriceId == null)
+                {
+                    return NotFound(new { message = "Product not found" }); 
+                }
+                ProductDTO productDTO = mapper.Map<Product, ProductDTO>(product);
+                return Ok(productDTO); 
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = $"Product not found {ex}" }); 
+                throw;
+            }
         }
 
         // PUT: api/Products/5
