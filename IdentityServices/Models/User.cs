@@ -12,11 +12,19 @@ namespace IdentityServices.Models
         public override Guid Id { get; set; } = Guid.NewGuid();
 
         public string FirstName { get; set; }
+        [Required]
         public string LastName { get; set; }
 
 
         [Required]
-        public Address Address { get; set; }
+        public string StreetName { get; set; }
+        [Required]
+        public int HouseNumber { get; set; }
+        [Required]
+        public string PostCode { get; set; }
+        [Required]
+        public string City { get; set; }
+        //public string Country { get; set; }
 
         // Niet <IdentityUserRole> !
         public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();

@@ -12,6 +12,7 @@ using IdentityServices.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using IdentityServices.Models;
 
 namespace IdentityServices
 {
@@ -29,15 +30,16 @@ namespace IdentityServices
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                    Configuration.GetConnectionString("IdentityServicesDB")));
+            services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddRoles<Role>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider serviceProvider, ApplicationDbContext context)
         {
             if (env.IsDevelopment())
             {
@@ -57,6 +59,10 @@ namespace IdentityServices
 
             app.UseAuthentication();
             app.UseAuthorization();
+            RoleManager<Role> roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
+            UserManager<User> userManager = serviceProvider.GetRequiredService<UserManager<User>>();
+
+            ApplicationDbContextSeeder.SeedAsync(context, env, roleManager, userManager).Wait();
 
             app.UseEndpoints(endpoints =>
             {
