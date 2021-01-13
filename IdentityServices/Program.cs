@@ -24,10 +24,8 @@ namespace IdentityServices
                 try
                 {
                     var context = services.GetRequiredService<ApplicationDbContext>();
-                    context.Database.EnsureDeleted();//verwijder (-> niet doen in productie)
-                    context.Database.EnsureCreated(); //maakt db aan volgens modellen via onmodelcreating
-                                                      // context.Database.Migrate();//voert migraties uit
-
+                    //context.Database.EnsureDeleted();//verwijder (-> niet doen in productie)
+                    context.Database.EnsureCreated(); 
                 }
                 catch (Exception ex)
                 {

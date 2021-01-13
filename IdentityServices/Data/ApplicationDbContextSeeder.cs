@@ -15,7 +15,7 @@ namespace IdentityServices.Data
 
         public static List<string> EmailList = new List<string>
         {
-            "shannon.goemaere@student.howest.be"
+            "shannon.goemaere@gmail.com"
         };
 
         public static async Task SeedAsync(ApplicationDbContext context, IWebHostEnvironment env, RoleManager<Role> roleManager, UserManager<User> userManager)
@@ -59,8 +59,11 @@ namespace IdentityServices.Data
                             Email = email,
                             UserName = email,
                             FirstName = email.Split('.')[0],
-                            LastName = email.Split('.')[1].Split('@')[0]
-
+                            LastName = email.Split('.')[1].Split('@')[0],
+                            StreetName = "Graaf Karel De Goedelaan",
+                            HouseNumber = 6,
+                            PostCode = "8850",
+                            City = "Kortrijk"
 
 
 

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +12,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using IdentityServices.Models;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.IO;
+using IdentityServices.Repositories;
+using IdentityServices.Mapping;
+using AutoMapper;
 
 namespace IdentityServices
 {
@@ -31,11 +36,29 @@ namespace IdentityServices
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("IdentityServicesDB")));
-            services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false)
-                .AddRoles<Role>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+            //mapper
+            services.AddAutoMapper(typeof(IdentityProfiles));
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "IdentiyServicesDB", Version = "v1" });
+            });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("MyAllowOrigins", builder =>
+                {
+                    builder.AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowAnyOrigin() // niet toegelaten indien credentials
+                                      // .WithOrigins("https://localhost", "http://localhost")
+                                      // .AllowCredentials()
+                    ;
+                });
+            });
+
+            services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +75,7 @@ namespace IdentityServices
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseCors("MyAllowOrigins");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -63,6 +87,12 @@ namespace IdentityServices
             UserManager<User> userManager = serviceProvider.GetRequiredService<UserManager<User>>();
 
             ApplicationDbContextSeeder.SeedAsync(context, env, roleManager, userManager).Wait();
+            app.UseSwagger(); //enable swagger
+            app.UseSwaggerUI(c =>
+            {
+                c.RoutePrefix = "swagger"; 
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "IdentityServicesDB v1");
+            });
 
             app.UseEndpoints(endpoints =>
             {
