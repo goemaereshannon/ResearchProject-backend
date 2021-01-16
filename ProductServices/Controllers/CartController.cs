@@ -68,10 +68,10 @@ namespace ProductServices.Controllers
             }
             catch (Exception)
             {
-
                 throw;
             }
-            var cartDTO = mapper.Map<Cart, CartDTO>(cart); 
+            var cartDTO = mapper.Map<Cart, CartDTO>(cart);
+            return Ok(cartDTO); 
 
         }
     }
