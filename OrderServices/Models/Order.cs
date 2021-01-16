@@ -10,7 +10,8 @@ namespace OrderServices.Models
         public Guid Id { get; set; } = Guid.NewGuid(); 
         public Guid UserId { get; set; }
         public string Status { get; set; } = "Bestelling wordt verwerkt";
-        public DateTime ShippingDate { get; set; }
-        public DateTime PlacementDate { get; set; } = DateTime.Now; 
+        public DateTime ShippingDate { get; set; } = DateTime.Now; 
+        public DateTime PlacementDate { get; set; } = DateTime.Now;
+        public ICollection<OrderProduct> OrderProducts { get; set; }
     }
 }

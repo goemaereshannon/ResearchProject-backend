@@ -23,6 +23,7 @@ namespace ProductServices.Models
 
         public ICollection<ProductHasSize> ProductHasSizes { get; set; }
         public ICollection<ProductHasProperty> ProductHasProperties { get; set; }
+        public ICollection<CartProduct> CartProducts { get; set; }
 
     }
 }

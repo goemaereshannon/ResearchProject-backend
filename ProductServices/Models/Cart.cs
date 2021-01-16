@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OrderServices.Models
+namespace ProductServices.Models
 {
     public class Cart
     {

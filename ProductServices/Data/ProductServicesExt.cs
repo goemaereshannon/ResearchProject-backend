@@ -24,7 +24,9 @@ namespace ProductServices.Data
                 modelBuilder.Entity<Product>().HasData(_productsData);
                 modelBuilder.Entity<ProductHasProperty>().HasData(_productHasPropertyData);
                 modelBuilder.Entity<Property>().HasData(_propertiesData);
-                modelBuilder.Entity<PropertyValue>().HasData(_propertyValuesData); 
+                modelBuilder.Entity<PropertyValue>().HasData(_propertyValuesData);
+                modelBuilder.Entity<Cart>().HasData(_cartsData);
+                modelBuilder.Entity<CartProduct>().HasData(_cartProductsData);
             }
             catch(Exception e)
             {
@@ -129,6 +131,24 @@ namespace ProductServices.Data
                 Id = new Guid("ff64f462-4303-4204-8f0a-f1500c1f47b6"),
                 PropertyId =  new Guid("fa38c158-cde3-4e01-a3a8-92ff534d2a89"), 
                 ProductId=  new Guid("d470123f-7795-4158-aa2b-9088e29de88d"),
+            }
+        };
+
+        private readonly static List<Cart> _cartsData = new List<Cart>
+        {
+            new Cart
+            {
+                Id = new Guid("e5698ebe-72a4-40a8-84a3-7e3e4eeeeae2"),
+                UserId = new Guid("96a30dc9-c01c-45fb-8a50-81baf9b10fca"),
+            }
+        };
+        private readonly static List<CartProduct> _cartProductsData = new List<CartProduct>
+        {
+            new CartProduct
+            {
+                Id = new Guid("c3fde068-9168-48ce-8763-cda48d178a9a"),
+                ProductId =new Guid("d470123f-7795-4158-aa2b-9088e29de88d"),
+                CartId = new Guid("e5698ebe-72a4-40a8-84a3-7e3e4eeeeae2"),
             }
         };
     }

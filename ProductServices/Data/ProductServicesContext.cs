@@ -28,18 +28,23 @@ namespace ProductServices.Data
         public virtual DbSet<Property> Properties { get; set; }
         public virtual DbSet<PropertyValue> PropertyValues { get; set; }
         public virtual DbSet<ProductHasProperty> ProductHasProperties { get; set; }
+        public virtual DbSet<CartProduct> CartProducts { get; set; }
+        public virtual DbSet<Cart> Carts { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
             builder.Entity<Product>().HasOne(p => p.Subcategory).WithMany(s => s.Products); 
             builder.Entity<Product>().HasMany(p => p.ProductHasSizes).WithOne(p => p.Product);
+            builder.Entity<Product>().HasMany(p => p.CartProducts).WithOne(cp => cp.Product);
             builder.Entity<Size>().HasMany(s => s.ProductHasSizes).WithOne(p => p.Size);
             builder.Entity<Price>().HasMany(p => p.Products).WithOne(p => p.Price);
             builder.Entity<Category>().HasMany(c => c.Subcategories).WithOne(s => s.Category);
             builder.Entity<Product>().HasMany(p => p.ProductHasProperties).WithOne(p => p.Product);
             builder.Entity<Property>().HasMany(p => p.PropertyValues).WithOne(p => p.Property);
-            builder.Entity<Property>().HasMany(p => p.ProductHasProperties).WithOne(p => p.Property); 
+            builder.Entity<Property>().HasMany(p => p.ProductHasProperties).WithOne(p => p.Property);
+            builder.Entity<Cart>().HasMany(c => c.CartProducts).WithOne(cp => cp.Cart);
 
             builder.SeedAsync().Wait(); 
         }
