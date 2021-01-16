@@ -95,14 +95,18 @@ namespace IdentityServices.Data
                     User admin = new User
                     {
                         Id = Guid.NewGuid(),
-                        FirstName = "Shannon", 
-                        LastName = "Goemaere", 
+
                         Email = "shannon.goemaere@student.howest.be",
-                        UserName = "ShannonGoemaere",
-                        StreetName = "Graaf Karel De Goedelaan",
-                        HouseNumber = 5,
-                        PostCode = "8850",
-                        City = "Kortrijk"
+                        UserName = "shannon.goemaere@student.howest.be",
+                        FirstName = "Shannon",
+                        LastName = "Goemaere",
+                        StreetName = "Ergensstraat",
+                        HouseNumber = 101,
+                        PostCode = "9000",
+                        City = "Gent"
+
+
+
                     };
                     await userManager.CreateAsync(admin, "Wachtwoord@0");
                     var role = roleManager.Roles.Where(r => r.Name.StartsWith("A")).FirstOrDefault();

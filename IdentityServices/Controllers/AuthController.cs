@@ -140,7 +140,6 @@ namespace IdentityServices.Controllers
                     if (user == null)
                         return StatusCode((int)HttpStatusCode.Unauthorized, "The combination of emailadres and password is wrong. Please try again.");
 
-                    //geen persistence, geen lockout -> via false, false 
                     var result = await signInMgr.PasswordSignInAsync(loginDTO.Email, loginDTO.Password, false, false);
 
                     if (result.Succeeded)
