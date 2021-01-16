@@ -25,7 +25,8 @@ namespace ProductServices.Profiles
             CreateMap<PropertyValueDTO, PropertyValue>().ReverseMap();
             CreateMap<SizeDTO, Size>().ReverseMap();
             CreateMap<SubcategoryDTO, Subcategory>().ReverseMap();
-
+            CreateMap<CartDTO, Cart>().ReverseMap();
+            CreateMap<CartProductDTO, CartProduct>().ReverseMap();
 
         }
     }
