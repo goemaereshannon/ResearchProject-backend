@@ -48,6 +48,8 @@ namespace OrderServices
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "OrderServices", Version = "v1" });
             });
+
+            services.AddScoped(typeof(IGenericRepo<>), typeof(GenericRepo<>));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

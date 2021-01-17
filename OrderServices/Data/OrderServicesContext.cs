@@ -26,7 +26,7 @@ namespace OrderServices.Data
         {
             base.OnModelCreating(builder);
             builder.Entity<Order>().HasMany(o => o.OrderProducts).WithOne(op => op.Order);
-
+            builder.Entity<OrderProduct>().HasOne(op => op.Order).WithMany(o => o.OrderProducts); 
             builder.SeedAsync().Wait(); 
         }
 
