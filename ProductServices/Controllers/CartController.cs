@@ -12,7 +12,6 @@ using ProductServices.Repositories;
 
 namespace ProductServices.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class CartController : ControllerBase
     {
@@ -74,5 +73,70 @@ namespace ProductServices.Controllers
             return Ok(cartDTO); 
 
         }
+
+        [HttpPost("api/cart/{cartId}/{productId}")]
+        public async Task<ActionResult<CartProductDTO>> PostProductToCart(Guid cartId, Guid productId)
+        {
+            CartProduct cartProduct = new CartProduct();
+            Product product = new Product(); 
+            try
+            {
+                Cart cart = await cartGenericRepo.GetAsyncByGuid(cartId) ; 
+                product = await productRepo.GetAsyncByGuid(productId);
+                if (product != null && cart != null)
+                {
+                    cartProduct.CartId = cart.Id;
+                    cartProduct.ProductId = product.Id;
+                    cartProduct.TotalItems += 1;
+                    cartProduct.TotalPrice += product.Price.Value;
+                    await cartProductGenericRepo.Create(cartProduct);
+                    return Created("api/cart", cartProduct); 
+                }
+                else
+                {
+                    return NotFound(new { message = "Cart or product not found" });
+                }
+            }
+            catch (Exception exc)
+            {
+                return RedirectToAction("HandleErrorCode", "Error", new
+                {
+                    statusCode = 400,
+                    errorMessage = $"Adding product to cart failed {exc}"
+                });
+                throw;
+            }
+
+        }
+        [HttpDelete("api/cart/{cartId}/{productId}")]
+        public async Task<ActionResult> DeleteProductFromCart(Guid cartId, Guid productId)
+        {
+
+            var products = await cartProductGenericRepo.GetByExpressionAsync(cp => cp.CartId == cartId && cp.ProductId == productId);
+            CartProduct cartProduct = products.FirstOrDefault();
+            Product product = await productRepo.GetAsyncByGuid(productId); 
+            if(cartProduct == null)
+            {
+                return BadRequest(); 
+            }
+            cartProduct.TotalItems -= 1;
+            cartProduct.TotalPrice -= product.Price.Value;
+            await cartProductGenericRepo.Delete(cartProduct);
+            try
+            {
+                await cartProductGenericRepo.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("HandleErrorCode", "Error", new
+                {
+                    statusCode = 400,
+                    errorMessage = $"Deleting product from cart failed {ex}"
+                });
+                throw;
+            }
+            return NoContent(); 
+        }
+      
     }
 }

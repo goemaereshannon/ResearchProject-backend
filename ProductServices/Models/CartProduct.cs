@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 namespace ProductServices.Models
 {
     public class CartProduct
-    {
-        [NotMapped]
-        private List<Product> _products = new List<Product>(); 
+    { 
         public Guid Id { get; set; } = Guid.NewGuid(); 
         public Guid ProductId { get; set; }
         public Guid CartId { get; set; }

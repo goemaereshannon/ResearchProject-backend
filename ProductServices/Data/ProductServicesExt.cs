@@ -80,7 +80,7 @@ namespace ProductServices.Data
                 Brand = "YSL",
                 SubcategoryId = new Guid("79A86C66-F7E4-4BC4-9E01-525AD78754BD"),
                 PriceId = new Guid("628B89E3-FFD4-4659-BA39-C67EEE11672B"),
-
+                ImageUrl = "https://images.unsplash.com/photo-1551446339-1e5c6f164ec2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=676&q=80", 
             }
         };
 
