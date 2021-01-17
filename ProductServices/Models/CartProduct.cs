@@ -13,8 +13,7 @@ namespace ProductServices.Models
         public Guid CartId { get; set; }
         public Cart Cart { get; set; }
         public Product Product { get; set; }
-        public int TotalItems { get; set; } = 0;
-        public double TotalPrice { get; set; } = 0.00; 
+        public int ItemQuantity { get; set; } = 1; 
 
     }
 }

@@ -139,7 +139,9 @@ namespace ProductServices.Data
             new Cart
             {
                 Id = new Guid("e5698ebe-72a4-40a8-84a3-7e3e4eeeeae2"),
-                UserId = new Guid("96a30dc9-c01c-45fb-8a50-81baf9b10fca"),
+                UserId = new Guid("C051825D-2611-402D-8B29-563DD883848B"),               
+                TotalItems = 1,
+                TotalPrice = 30.75,
             }
         };
         private readonly static List<CartProduct> _cartProductsData = new List<CartProduct>
@@ -149,6 +151,7 @@ namespace ProductServices.Data
                 Id = new Guid("c3fde068-9168-48ce-8763-cda48d178a9a"),
                 ProductId =new Guid("d470123f-7795-4158-aa2b-9088e29de88d"),
                 CartId = new Guid("e5698ebe-72a4-40a8-84a3-7e3e4eeeeae2"),
+
             }
         };
     }

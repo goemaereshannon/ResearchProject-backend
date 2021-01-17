@@ -69,28 +69,75 @@ namespace ProductServices.Controllers
             {
                 throw;
             }
+            if(cart == null)
+            {
+                return NotFound(new { message = "Cart not found"});
+            }
             var cartDTO = mapper.Map<Cart, CartDTO>(cart);
             return Ok(cartDTO); 
 
         }
+        [HttpPost("api/cart")]
+        public async Task<ActionResult<CartDTO>> PostCart(Guid userId)
+        {
+            Cart cart = new Cart();
+            try
+            {
+                cart.UserId = userId;
+                await cartGenericRepo.Create(cart);
+                return Ok(cart); 
 
-        [HttpPost("api/cart/{cartId}/{productId}")]
-        public async Task<ActionResult<CartProductDTO>> PostProductToCart(Guid cartId, Guid productId)
+            }
+            catch (Exception exc)
+            {
+                return RedirectToAction("HandleErrorCode", "Error", new
+                {
+                    statusCode = 400,
+                    errorMessage = $"Creating cart failed {exc}"
+                });
+                throw;
+            }
+        }
+
+        [HttpPost("api/cart/{userId}/{productId}")]
+        public async Task<ActionResult<CartProductDTO>> PostProductToCart(Guid userId, Guid productId)
         {
             CartProduct cartProduct = new CartProduct();
             Product product = new Product(); 
             try
             {
-                Cart cart = await cartGenericRepo.GetAsyncByGuid(cartId) ; 
+                //Zoek of user al cart heeft 
+                var carts = await cartGenericRepo.GetByExpressionAsync(c => c.UserId == userId);
+                Cart cart = carts.FirstOrDefault(); 
                 product = await productRepo.GetAsyncByGuid(productId);
                 if (product != null && cart != null)
                 {
                     cartProduct.CartId = cart.Id;
                     cartProduct.ProductId = product.Id;
-                    cartProduct.TotalItems += 1;
-                    cartProduct.TotalPrice += product.Price.Value;
+                    cart.TotalItems += 1;
+                    cart.TotalPrice += product.Price.Value;
                     await cartProductGenericRepo.Create(cartProduct);
+                    await cartGenericRepo.Update(cart, cart.Id); 
                     return Created("api/cart", cartProduct); 
+                }
+                else if(cart == null){
+                   await PostCart(userId);
+                    var allCarts = await cartGenericRepo.GetByExpressionAsync(c => c.UserId == userId);
+                    Cart thisCart = allCarts.FirstOrDefault();
+                    if (product != null && thisCart != null)
+                    {
+                        cartProduct.CartId = thisCart.Id;
+                        cartProduct.ProductId = product.Id;
+                        thisCart.TotalItems += 1;
+                        thisCart.TotalPrice += product.Price.Value;
+                        await cartProductGenericRepo.Create(cartProduct);
+                        await cartGenericRepo.Update(thisCart, thisCart.Id); 
+                        return Created("api/cart", cartProduct);
+                    }
+                    else
+                    {
+                        return NotFound(new { message = "Cart or product not found" });
+                    }
                 }
                 else
                 {
@@ -119,8 +166,10 @@ namespace ProductServices.Controllers
             {
                 return BadRequest(); 
             }
-            cartProduct.TotalItems -= 1;
-            cartProduct.TotalPrice -= product.Price.Value;
+            Cart cart = await cartGenericRepo.GetAsyncByGuid(cartId); 
+            cart.TotalItems -= 1;
+            cart.TotalPrice -= product.Price.Value;
+            await cartGenericRepo.Update(cart, cartId) ; 
             await cartProductGenericRepo.Delete(cartProduct);
             try
             {
