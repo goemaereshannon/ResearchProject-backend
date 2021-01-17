@@ -39,7 +39,28 @@ namespace OrderServices.Controllers
 	        {
                 return NotFound(new { message = "Orders not found " + exc });
             }
-            return Ok(orders);         }
+            return Ok(orders);         
+        }
+
+        [HttpGet("/api/orders/{userId}")]
+        public async Task<ActionResult<IEnumerable<Order>>> GetOrdersByUserId(Guid userId)
+        {
+            IEnumerable<Order> orders;
+            try
+            {
+                orders = await genericOrderRepo.GetByExpressionAsync(o => o.UserId == userId);
+                foreach (var order in orders)
+                {
+                    IEnumerable<OrderProduct> orderProducts = await genericOrderProductRepo.GetByExpressionAsync(op => op.OrderId == order.Id);
+                    order.OrderProducts = orderProducts.ToList();
+                }
+            }
+            catch (Exception exc)
+            {
+                return NotFound(new { message = "Orders not found " + exc });
+            }
+            return Ok(orders);
+        }
 
     }
 }
