@@ -62,5 +62,40 @@ namespace OrderServices.Controllers
             return Ok(orders);
         }
 
+        [HttpPost("api/order/{userId}")]
+        public async Task<ActionResult<OrderProduct>> PostProductsToOrder(Guid userId,[FromBody] List<Guid> productIds, double price)
+        {
+            List<OrderProduct> orderProducts = new List<OrderProduct>();
+            Order order = new Order();
+            order.UserId = userId;
+            order.TotalPrice = price; 
+            try
+            {
+                var orderPost = await genericOrderRepo.Create(order);
+                if (orderPost == null)
+                {
+                    return BadRequest(new { Message = $"Not able to create new order" });
+                }
+                foreach (var productId in productIds)
+                {
+                    OrderProduct orderProduct = new OrderProduct();
+                    orderProduct.OrderId = order.Id; 
+                    orderProduct.ProductId = productId;
+                    orderProducts.Add(orderProduct);
+                    var result = await genericOrderProductRepo.Create(orderProduct); 
+                    if(result == null)
+                    {
+                        return BadRequest(new { Message = $"Product {productId} could not be saved to order" });
+                    }
+                }
+                return Created("api/order/{userId}", orderProducts); 
+            }
+            catch (Exception e)
+            {
+                return BadRequest(); 
+                throw e;
+            }
+        }
+
     }
 }

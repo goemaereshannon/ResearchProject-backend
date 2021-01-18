@@ -22,7 +22,7 @@ namespace OrderServices
                 try
                 {
                     var context = services.GetRequiredService<OrderServicesContext>();
-                    //context.Database.EnsureDeleted();
+                    context.Database.EnsureDeleted();
                     context.Database.EnsureCreated();
                 }
                 catch (Exception ex)

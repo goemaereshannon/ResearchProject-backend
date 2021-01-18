@@ -56,6 +56,32 @@ namespace ProductServices.Controllers
             var productDTO = mapper.Map<IEnumerable<Product>, IEnumerable<ProductDTO>>(allProducts);
             return Ok(productDTO);
         }
+
+        [HttpGet("api/cartitemIds/{userId}")]
+        public async Task<ActionResult<List<string>>> GetCartItemIdsByUserId(Guid userId)
+        {
+            Cart cart;
+            List<string> products = new List<string>();
+            try
+            {
+                IEnumerable<Cart> carts = await cartGenericRepo.GetByExpressionAsync(c => c.UserId == userId);
+                cart = carts.FirstOrDefault();
+                IEnumerable<CartProduct> cartProducts = await cartProductGenericRepo.GetByExpressionAsync(cp => cp.CartId == cart.Id);
+
+                foreach (CartProduct item in cartProducts)
+                {
+                    Product product = await productRepo.GetAsyncByGuid(item.ProductId);
+                    products.Add(product.Id.ToString());
+                }
+            }
+
+            catch (Exception e)
+            {
+                return NotFound(new { message = "Cart not found" + e });
+            };
+            return Ok(products);
+        }
+
         [HttpGet("api/cart/{userId}")]
         public async Task<ActionResult<CartDTO>> GetCartByUserId(Guid userId)
         {
