@@ -212,6 +212,41 @@ namespace ProductServices.Controllers
             }
             return NoContent(); 
         }
-      
+
+        [HttpDelete("api/cart/{cartId}")]
+        public async Task<ActionResult> DeleteAllProductsFromCart(Guid cartId)
+        {
+            // ophalen alle producten uit tussentabel met cartId gegeven cartId
+            var products = await cartProductGenericRepo.GetByExpressionAsync(cp => cp.CartId == cartId);
+            if (products == null) // geen producten in cart => return
+            {
+                return BadRequest();
+            }
+            foreach (var item in products) //voor elk product in de tussentabel => product verwijderen 
+            {
+                await cartProductGenericRepo.Delete(item); 
+            }
+
+            Cart cart = await cartGenericRepo.GetAsyncByGuid(cartId);
+            cart.TotalItems -= cart.TotalItems;
+            cart.TotalPrice -= cart.TotalPrice;
+            await cartGenericRepo.Update(cart, cartId);
+            try
+            {
+                await cartProductGenericRepo.SaveAsync();
+                await cartGenericRepo.SaveAsync(); 
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("HandleErrorCode", "Error", new
+                {
+                    statusCode = 400,
+                    errorMessage = $"Deleting product from cart failed {ex}"
+                });
+                throw;
+            }
+            return NoContent();
+        }
+
     }
 }
