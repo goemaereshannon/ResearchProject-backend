@@ -143,12 +143,13 @@ namespace ProductServices.Controllers
                 //geen (sub)category meegegeven of category is Nieuw 
                 if (!string.IsNullOrEmpty(category) || !string.IsNullOrEmpty(subcategory) || category != "Nieuw")
                 {
-                    category = Uri.UnescapeDataString(category);
-                    subcategory = Uri.UnescapeDataString(subcategory);
+
+
                     try
                     {
                         if (!string.IsNullOrEmpty(subcategory))
                         {
+                            subcategory = Uri.UnescapeDataString(subcategory);
                             try
                             {
                                 products = await productRepo.GetByExpressionAsync(pr => pr.Subcategory.Name == subcategory);
@@ -163,6 +164,7 @@ namespace ProductServices.Controllers
                         //category meegegeven 
                         else if (!string.IsNullOrEmpty(category))
                         {
+                            category = Uri.UnescapeDataString(category);
                             try
                             {
                                 products = await productRepo.GetByExpressionAsync(pr =>
