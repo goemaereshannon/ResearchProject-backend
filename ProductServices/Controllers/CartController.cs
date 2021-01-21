@@ -125,9 +125,15 @@ namespace ProductServices.Controllers
             }
         }
 
-        [HttpPost("api/cart/{userId}/{productId}")]
-        public async Task<ActionResult<CartProductDTO>> PostProductToCart(Guid userId, Guid productId)
+        [HttpPost("api/cartproduct")]
+        public async Task<ActionResult<CartProductDTO>> PostProductToCart(CartProductCreateEditDTO dto)
         {
+            Guid userId = Guid.NewGuid();
+            Guid productId = Guid.NewGuid(); 
+            if (ModelState.IsValid) { 
+            userId = new Guid(dto.UserId);
+            productId = new Guid(dto.ProductId);
+            }
             CartProduct cartProduct = new CartProduct();
             Product product = new Product(); 
             try
