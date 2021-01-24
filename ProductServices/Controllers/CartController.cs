@@ -224,7 +224,7 @@ namespace ProductServices.Controllers
         {
             // ophalen alle producten uit tussentabel met cartId gegeven cartId
             var products = await cartProductGenericRepo.GetByExpressionAsync(cp => cp.CartId == cartId);
-            if (products == null) // geen producten in cart => return
+             if (products == null) // geen producten in cart => return
             {
                 return BadRequest();
             }
