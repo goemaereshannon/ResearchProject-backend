@@ -23,7 +23,7 @@ namespace ProductServices.Repositories
                 .Include(p => p.Subcategory).ThenInclude(s => s.Category)
                 .Include(p=> p.ProductHasProperties).ThenInclude(p=>p.Property).ThenInclude(p=> p.PropertyValues)
                 .Include(p=>p.ProductHasSizes).ThenInclude(p=> p.Size)
-                .OrderBy(p => p.CreationDate)
+                .OrderByDescending(p => p.CreationDate)
                 .ToListAsync(); 
         }
 

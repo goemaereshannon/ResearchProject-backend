@@ -97,7 +97,9 @@ namespace ProductServices.Controllers
             }
             if(cart == null)
             {
-                return NotFound(new { message = "Cart not found"});
+                PostCart(userId);
+                var allCarts = await cartGenericRepo.GetByExpressionAsync(c => c.UserId == userId);
+                cart = allCarts.FirstOrDefault();
             }
             var cartDTO = mapper.Map<Cart, CartDTO>(cart);
             return Ok(cartDTO); 
@@ -199,9 +201,10 @@ namespace ProductServices.Controllers
                 return BadRequest(); 
             }
             Cart cart = await cartGenericRepo.GetAsyncByGuid(cartId); 
-            cart.TotalItems -= 1;
-            cart.TotalPrice -= product.Price.Value;
-            await cartGenericRepo.Update(cart, cartId) ; 
+            cart.TotalItems = cart.TotalItems -  1;
+            cart.TotalPrice = cart.TotalPrice - product.Price.Value;
+            await cartGenericRepo.Update(cart, cartId) ;
+            var cartTest = await cartGenericRepo.GetAsyncByGuid(cartId); 
             await cartProductGenericRepo.Delete(cartProduct);
             try
             {
@@ -221,7 +224,7 @@ namespace ProductServices.Controllers
 
         [HttpDelete("api/cart/{cartId}")]
         public async Task<ActionResult> DeleteAllProductsFromCart(Guid cartId)
-        {
+           {
             // ophalen alle producten uit tussentabel met cartId gegeven cartId
             var products = await cartProductGenericRepo.GetByExpressionAsync(cp => cp.CartId == cartId);
              if (products == null) // geen producten in cart => return
