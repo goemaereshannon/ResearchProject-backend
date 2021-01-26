@@ -24,7 +24,9 @@ namespace ProductServices.Data
                 modelBuilder.Entity<Product>().HasData(_productsData);
                 modelBuilder.Entity<ProductHasProperty>().HasData(_productHasPropertyData);
                 modelBuilder.Entity<Property>().HasData(_propertiesData);
-                modelBuilder.Entity<PropertyValue>().HasData(_propertyValuesData); 
+                modelBuilder.Entity<PropertyValue>().HasData(_propertyValuesData);
+                modelBuilder.Entity<Cart>().HasData(_cartsData);
+                modelBuilder.Entity<CartProduct>().HasData(_cartProductsData);
             }
             catch(Exception e)
             {
@@ -78,7 +80,7 @@ namespace ProductServices.Data
                 Brand = "YSL",
                 SubcategoryId = new Guid("79A86C66-F7E4-4BC4-9E01-525AD78754BD"),
                 PriceId = new Guid("628B89E3-FFD4-4659-BA39-C67EEE11672B"),
-
+                ImageUrl = "https://images.unsplash.com/photo-1551446339-1e5c6f164ec2?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=676&q=80", 
             }
         };
 
@@ -129,6 +131,27 @@ namespace ProductServices.Data
                 Id = new Guid("ff64f462-4303-4204-8f0a-f1500c1f47b6"),
                 PropertyId =  new Guid("fa38c158-cde3-4e01-a3a8-92ff534d2a89"), 
                 ProductId=  new Guid("d470123f-7795-4158-aa2b-9088e29de88d"),
+            }
+        };
+
+        private readonly static List<Cart> _cartsData = new List<Cart>
+        {
+            new Cart
+            {
+                Id = new Guid("e5698ebe-72a4-40a8-84a3-7e3e4eeeeae2"),
+                UserId = new Guid("C051825D-2611-402D-8B29-563DD883848B"),               
+                TotalItems = 1,
+                TotalPrice = 30.75,
+            }
+        };
+        private readonly static List<CartProduct> _cartProductsData = new List<CartProduct>
+        {
+            new CartProduct
+            {
+                Id = new Guid("c3fde068-9168-48ce-8763-cda48d178a9a"),
+                ProductId =new Guid("d470123f-7795-4158-aa2b-9088e29de88d"),
+                CartId = new Guid("e5698ebe-72a4-40a8-84a3-7e3e4eeeeae2"),
+
             }
         };
     }

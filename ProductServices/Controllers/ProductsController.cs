@@ -13,7 +13,6 @@ using ProductServices.Repositories;
 
 namespace ProductServices.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
@@ -25,13 +24,14 @@ namespace ProductServices.Controllers
         private readonly IGenericRepo<Subcategory> genericSubcategoryRepo;
         private readonly IMapper mapper;
 
-        public ProductsController(ProductServicesContext context, IProductRepo productRepo, IGenericRepo<Price> genericPriceRepo , IGenericRepo<Category> genericCategoryRepo, IGenericRepo<Subcategory> genericSubcategoryRepo  ,IMapper mapper)
+        public ProductsController(ProductServicesContext context, IProductRepo productRepo, IGenericRepo<Price> genericPriceRepo , IGenericRepo<Category> genericCategoryRepo, IGenericRepo<Subcategory> genericSubcategoryRepo  ,IMapper mapper, IGenericRepo<Product> genericProductRepo)
         {
             _context = context;
             this.productRepo = productRepo;
             this.genericPriceRepo = genericPriceRepo;
             this.genericCategoryRepo = genericCategoryRepo;
             this.genericSubcategoryRepo = genericSubcategoryRepo;
+            this.genericProductRepo = genericProductRepo; 
             this.mapper = mapper;
         }
 
@@ -143,12 +143,13 @@ namespace ProductServices.Controllers
                 //geen (sub)category meegegeven of category is Nieuw 
                 if (!string.IsNullOrEmpty(category) || !string.IsNullOrEmpty(subcategory) || category != "Nieuw")
                 {
-                    category = Uri.UnescapeDataString(category);
-                    subcategory = Uri.UnescapeDataString(subcategory);
+
+
                     try
                     {
                         if (!string.IsNullOrEmpty(subcategory))
                         {
+                            subcategory = Uri.UnescapeDataString(subcategory);
                             try
                             {
                                 products = await productRepo.GetByExpressionAsync(pr => pr.Subcategory.Name == subcategory);
@@ -163,6 +164,7 @@ namespace ProductServices.Controllers
                         //category meegegeven 
                         else if (!string.IsNullOrEmpty(category))
                         {
+                            category = Uri.UnescapeDataString(category);
                             try
                             {
                                 products = await productRepo.GetByExpressionAsync(pr =>
@@ -308,7 +310,7 @@ namespace ProductServices.Controllers
             }
                 }
 
-        [HttpPost("/api/products")]
+        [HttpPost("/api/product")]
         public async Task<ActionResult<ProductCreateEditDTO>> PostProduct([FromBody] ProductCreateEditDTO productDTO)
         {
             try
@@ -359,7 +361,15 @@ namespace ProductServices.Controllers
                 newPrice.Value = productDTO.Price.Value;
                 newPrice.Id = productDTO.Price.Id; 
                 await genericPriceRepo.Create(mapper.Map<Price>(newPrice));
-                newProduct.PriceId = newPrice.Id; 
+                newProduct.PriceId = newPrice.Id;
+
+                newProduct.Name = productDTO.Name;
+                newProduct.Brand = productDTO.Brand;
+                newProduct.Description = productDTO.Description;
+                newProduct.ImageUrl = productDTO.ImageUrl; 
+
+                //Post product 
+                await genericProductRepo.Create(newProduct); 
 
                 return Created("api/products", productDTO); 
             }
@@ -370,7 +380,6 @@ namespace ProductServices.Controllers
                     statusCode = 400,
                     errorMessage = $"Creating product {productDTO.Name} failed {exc}"
                 });
-                throw;
                 throw exc;
             }
         }
